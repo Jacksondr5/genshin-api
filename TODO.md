@@ -1,0 +1,7 @@
+- Newtonsoft null checks
+- Connect to dumb-storage via config values
+- Pipeline
+- Container image
+- README
+- tests?
+- validation?

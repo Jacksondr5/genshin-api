@@ -1,0 +1,54 @@
+name: "1.0$(Rev:.r)"
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  CI: "true"
+  isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  solution: "genshin-api.sln"
+  buildPlatform: "Any CPU"
+  buildConfiguration: "Release"
+  appName: "genshin-api"
+
+steps:
+  - task: UseDotNet@2
+    displayName: Install .NET 5.0.x
+    inputs:
+      packageType: "sdk"
+      version: "5.0.x"
+  - task: DotNetCoreCLI@2
+    displayName: Restore Packages
+    inputs:
+      command: "restore"
+      projects: $(solution)
+      feedsToUse: "select"
+      verbosityRestore: "Normal"
+  - task: DotNetCoreCLI@2
+    displayName: Build Solution
+    inputs:
+      command: "build"
+      projects: $(solution)
+      arguments: "-c $(buildConfiguration) --no-restore --nologo"
+  - task: DotNetCoreCLI@2
+    displayName: Publish Solution
+    inputs:
+      command: "publish"
+      projects: $(solution)
+      arguments: "-c $(buildConfiguration) --no-build --nologo"
+      zipAfterPublish: false
+  - task: Docker@2
+    displayName: Login to Docker
+    inputs:
+      command: login
+      containerRegistry: "Docker Hub"
+  - task: Docker@2
+    displayName: Build and Push Docker Image
+    inputs:
+      containerRegistry: "Docker Hub"
+      repository: jacksondr5/genshin-api
+      command: buildAndPush
+      Dockerfile: Dockerfile
+      tags: |
+        $(Build.BuildNumber)
+        latest

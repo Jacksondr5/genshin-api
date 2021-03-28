@@ -7,6 +7,6 @@ namespace Core
     {
         Task CreateArtifact(Artifact newArtifact);
         Task<List<Artifact>> GetAllArtifacts();
-        Task UpdateArtifact(int artifactId, Artifact updatedArtifact);
+        Task UpdateArtifact(Artifact updatedArtifact);
     }
 }

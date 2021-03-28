@@ -21,15 +21,12 @@ namespace Core
         public Task<List<Artifact>> GetAllArtifacts() =>
             _repo.GetAllArtifacts();
 
-        public async Task<Artifact> UpdateArtifact(
-            int artifactId,
-            Artifact updatedArtifact
-        )
+        public async Task<Artifact> UpdateArtifact(Artifact updatedArtifact)
         {
             var artifacts = await _repo.GetAllArtifacts();
-            if (!artifacts.Any(x => x.Id == artifactId))
+            if (!artifacts.Any(x => x.Id == updatedArtifact.Id))
                 throw new GenshinException(GenshinMessages.ArtifactNotFound);
-            await _repo.UpdateArtifact(artifactId, updatedArtifact);
+            await _repo.UpdateArtifact(updatedArtifact);
             return updatedArtifact;
         }
     }

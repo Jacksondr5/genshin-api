@@ -73,7 +73,7 @@ namespace Core.Test
         }
 
         [TestMethod]
-        public void UpdateArtifact_ArtifactIdDoesNotExist_ShouldThrowException()
+        public void UpdateArtifact_ArtifactDoesNotExist_ShouldThrowException()
         {
             //Assemble
             _repoMock
@@ -82,7 +82,7 @@ namespace Core.Test
 
             //Act
             Func<Task<Artifact>> act = () =>
-                _service.UpdateArtifact(5, _testArtifact);
+                _service.UpdateArtifact(_testArtifact);
 
             //Assert
             act
@@ -99,13 +99,12 @@ namespace Core.Test
             input.Type = 9;
 
             //Act
-            var actual = await _service.UpdateArtifact(input.Id, input);
+            var actual = await _service.UpdateArtifact(input);
 
             //Assert
             actual.Type.Should().Be(input.Type);
             _repoMock.Verify(
                 x => x.UpdateArtifact(
-                    input.Id,
                     It.Is<Artifact>(y => y.Type == input.Type)
                 ),
                 Times.Once

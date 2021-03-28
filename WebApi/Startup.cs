@@ -44,6 +44,9 @@ namespace WebApi
             );
             services.AddScoped<IArtifactService, ArtifactService>();
             services.AddScoped<IArtifactRepository, ArtifactRepository>();
+            services.AddScoped<ICharacterService, CharacterService>();
+            services.AddScoped<ICharacterRepository, CharacterRepository>();
+            services.AddScoped(typeof(StorageModelRepository));
             services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(c =>
             {

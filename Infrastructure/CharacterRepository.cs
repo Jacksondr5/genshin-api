@@ -5,31 +5,31 @@ using Core;
 
 namespace Infrastructure
 {
-    public class ArtifactRepository : IArtifactRepository
+    public class CharacterRepository : ICharacterRepository
     {
         private readonly StorageModelRepository _storageModelRepo;
-        public ArtifactRepository(StorageModelRepository storageModelRepo) =>
+        public CharacterRepository(StorageModelRepository storageModelRepo) =>
             (_storageModelRepo) = (storageModelRepo);
 
-        public async Task CreateArtifact(Artifact newArtifact)
+        public async Task CreateCharacter(Character newCharacter)
         {
             var model = await _storageModelRepo.GetStorageModel();
-            model.Artifacts.Add(newArtifact);
+            model.Characters.Add(newCharacter);
             await _storageModelRepo.UpdateStorageModel(model);
         }
 
-        public async Task<List<Artifact>> GetAllArtifacts()
+        public async Task<List<Character>> GetAllCharacters()
         {
             var model = await _storageModelRepo.GetStorageModel();
-            return model.Artifacts;
+            return model.Characters;
         }
 
-        public async Task UpdateArtifact(Artifact updatedArtifact)
+        public async Task UpdateCharacter(Character updatedCharacter)
         {
             var model = await _storageModelRepo.GetStorageModel();
-            var artifact =
-                model.Artifacts.First(x => x.Id == updatedArtifact.Id);
-            artifact = updatedArtifact;
+            var character =
+                model.Characters.First(x => x.Id == updatedCharacter.Id);
+            character = updatedCharacter;
             await _storageModelRepo.UpdateStorageModel(model);
         }
     }

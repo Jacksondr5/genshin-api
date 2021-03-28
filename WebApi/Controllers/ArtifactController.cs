@@ -22,9 +22,7 @@ namespace WebApi.Controllers
             _service.CreateArtifact(newArtifact);
 
         [HttpPut("{artifactId}")]
-        public Task<Artifact> Put(
-            [FromRoute] int artifactId,
-            [FromBody] Artifact artifact
-        ) => _service.UpdateArtifact(artifactId, artifact);
+        public Task<Artifact> Put([FromBody] Artifact artifact) =>
+            _service.UpdateArtifact(artifact);
     }
 }

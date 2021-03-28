@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Core;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,28 +8,28 @@ namespace WebApi.Controllers
 {
     public class CharacterController : ControllerBase
     {
+        private readonly ICharacterService _service;
+        public CharacterController(ICharacterService service) =>
+            (_service) = (service);
+
         [HttpGet]
-        public IEnumerable<Character> GetAll()
-        {
-            throw new NotImplementedException();
-        }
+        public Task<List<Character>> GetAllCharacters() =>
+            _service.GetAllCharacters();
+
+        [HttpPost]
+        public Task<Character> AddCharacter([FromBody] Character newCharacter) =>
+            _service.CreateCharacter(newCharacter);
 
         [HttpPost("{characterId}/Loadout")]
-        public Loadout AddLoadout(
+        public Task<Loadout> AddLoadoutToCharacter(
             [FromRoute] int characterId,
-            [FromBody] Loadout loadout
-        )
-        {
-            throw new NotImplementedException();
-        }
+            [FromBody] Loadout newLoadout
+        ) => _service.AddLoadoutToCharacter(characterId, newLoadout);
 
-        [HttpPut("{characterId}")]
-        public Loadout Put(
+        [HttpPut("{characterId}/Loadout/{loadoutId}")]
+        public Task<Loadout> UpdateLoadout(
             [FromRoute] int characterId,
-            [FromBody] Loadout loadout
-        )
-        {
-            throw new NotImplementedException();
-        }
+            [FromBody] Loadout updatedLoadout
+        ) => _service.UpdateLoadout(characterId, updatedLoadout);
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace WebApi.Model
+namespace Core
 {
     public class Artifact
     {

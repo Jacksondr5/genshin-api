@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core;
+using Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,8 +16,10 @@ using Microsoft.OpenApi.Models;
 
 namespace WebApi
 {
+
     public class Startup
     {
+        private const string CorsPolicyName = "_k8s.j5 policy";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -26,8 +30,21 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddControllers();
+            services.AddCors(o =>
+                o.AddPolicy(
+                    name: CorsPolicyName,
+                    builder =>
+                    {
+                        //builder
+                        //    .WithOrigins("http://*.j5")
+                        //    .SetIsOriginAllowedToAllowWildcardSubdomains();
+                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    }
+                )
+            );
+            services.AddScoped<IArtifactService, ArtifactService>();
+            services.AddScoped<IArtifactRepository, ArtifactRepository>();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
@@ -47,6 +64,8 @@ namespace WebApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(CorsPolicyName);
 
             app.UseAuthorization();
 

@@ -1,4 +1,4 @@
-namespace WebApi.Model
+namespace Core
 {
     public class Character
     {

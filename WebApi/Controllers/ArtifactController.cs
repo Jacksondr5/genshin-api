@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Core;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Model;
 
 namespace WebApi.Controllers
 {
@@ -9,25 +9,22 @@ namespace WebApi.Controllers
     [Route("artifact")]
     public class ArtifactController : ControllerBase
     {
+        private readonly IArtifactService _service;
+        public ArtifactController(IArtifactService service) =>
+            (_service) = (service);
+
         [HttpGet]
-        public IEnumerable<Artifact> GetAll()
-        {
-            throw new NotImplementedException();
-        }
+        public Task<List<Artifact>> GetAll() =>
+            _service.GetAllArtifacts();
 
         [HttpPost]
-        public Artifact Post([FromBody] Artifact newArtifact)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<Artifact> Post([FromBody] Artifact newArtifact) =>
+            _service.CreateArtifact(newArtifact);
 
         [HttpPut("{artifactId}")]
-        public Artifact Put(
+        public Task<Artifact> Put(
             [FromRoute] int artifactId,
             [FromBody] Artifact artifact
-        )
-        {
-            throw new NotImplementedException();
-        }
+        ) => _service.UpdateArtifact(artifactId, artifact);
     }
 }

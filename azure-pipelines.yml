@@ -31,6 +31,12 @@ steps:
       projects: $(solution)
       arguments: "-c $(buildConfiguration) --no-restore --nologo"
   - task: DotNetCoreCLI@2
+    displayName: Run Tests
+    inputs:
+      command: test
+      projects: $(solution)
+      arguments: "-c $(buildconfiguration) --no-build"
+  - task: DotNetCoreCLI@2
     displayName: Publish Solution
     inputs:
       command: "publish"

@@ -23,7 +23,7 @@ steps:
       command: "restore"
       projects: $(solution)
       feedsToUse: "select"
-      verbosityRestore: "Normal"
+      verbosityRestore: "Minimal"
   - task: DotNetCoreCLI@2
     displayName: Build Solution
     inputs:

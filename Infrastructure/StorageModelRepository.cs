@@ -12,7 +12,7 @@ namespace Infrastructure
         private readonly HttpClient _client;
         public StorageModelRepository(IConfiguration config)
         {
-            _route = config["dumb-storage-url"];
+            _route = config["DumbStorageUrl"];
             _client = new HttpClient();
         }
 

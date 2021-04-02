@@ -6,6 +6,7 @@ namespace Core
     {
         public int Id { get; set; }
         public ArtifactStat MainStat { get; set; } = new ArtifactStat();
+        public int Set { get; set; }
         public List<ArtifactStat> SubStats { get; set; } =
             new List<ArtifactStat>();
         public int Type { get; set; }

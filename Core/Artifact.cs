@@ -5,7 +5,9 @@ namespace Core
     public class Artifact
     {
         public int Id { get; set; }
+        public int Level { get; set; }
         public ArtifactStat MainStat { get; set; } = new ArtifactStat();
+        public int Quality { get; set; }
         public int Set { get; set; }
         public List<ArtifactStat> SubStats { get; set; } =
             new List<ArtifactStat>();
@@ -14,8 +16,8 @@ namespace Core
 
     public class ArtifactStat
     {
-        public int StatType { get; set; }
         public int StatName { get; set; }
+        public int StatType { get; set; }
         public float Value { get; set; }
     }
 }

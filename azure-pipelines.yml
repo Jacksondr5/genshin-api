@@ -3,6 +3,9 @@ name: "1.0$(Rev:.r)"
 pool:
   vmImage: "ubuntu-latest"
 
+trigger:
+  - main
+
 variables:
   CI: "true"
   isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]

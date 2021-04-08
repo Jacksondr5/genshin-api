@@ -13,7 +13,7 @@ namespace WebApi.Controllers
         public ArtifactController(IArtifactService service) =>
             (_service) = (service);
 
-        [HttpDelete("{artifactId")]
+        [HttpDelete("{artifactId}")]
         public Task<Artifact> Delete([FromRoute] int artifactId) =>
             _service.DeleteArtifact(artifactId);
 

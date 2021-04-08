@@ -62,6 +62,42 @@ namespace Core.Test
         }
 
         [TestMethod]
+        public void DeleteArtifact_ArtifactDoesNotExist_ShouldThrowException()
+        {
+            //Assemble
+            _repoMock
+                .Setup(x => x.GetAllArtifacts())
+                .ReturnsAsync(new List<Artifact>());
+
+            //Act
+            Func<Task<Artifact>> act = () =>
+                _service.DeleteArtifact(_testArtifact.Id);
+
+            //Assert
+            act
+                .Should()
+                .ThrowExactly<GenshinException>()
+                .WithMessage(GenshinMessages.ArtifactNotFound);
+        }
+
+        [TestMethod]
+        public async Task DeleteArtifact_InputIsGood_ShouldDeleteArtifact()
+        {
+            //Assemble
+            var expected = _testArtifact;
+
+            //Act
+            var actual = await _service.DeleteArtifact(_testArtifact.Id);
+
+            //Assert
+            actual.Should().BeEquivalentTo(expected);
+            _repoMock.Verify(
+                x => x.DeleteArtifact(_testArtifact.Id),
+                Times.Once
+            );
+        }
+
+        [TestMethod]
         public async Task GetAllArtifacts_ShouldReturnAllArtifacts()
         {
             //Act

@@ -18,6 +18,13 @@ namespace Infrastructure
             await _storageModelRepo.UpdateStorageModel(model);
         }
 
+        public async Task DeleteArtifact(int artifactId)
+        {
+            var model = await _storageModelRepo.GetStorageModel();
+            model.Artifacts.RemoveAll(x => x.Id == artifactId);
+            await _storageModelRepo.UpdateStorageModel(model);
+        }
+
         public async Task<List<Artifact>> GetAllArtifacts()
         {
             var model = await _storageModelRepo.GetStorageModel();

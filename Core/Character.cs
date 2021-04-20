@@ -14,8 +14,8 @@ namespace Core
         public int CircletId { get; set; }
         public int ClockId { get; set; }
         public int CupId { get; set; }
-        public int FlowerId { get; set; }
         public int FeatherId { get; set; }
+        public int FlowerId { get; set; }
         public int Id { get; set; }
         public string Name { get; set; } = "";
     }

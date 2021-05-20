@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {
+    [Route("character")]
     public class CharacterController : ControllerBase
     {
         private readonly ICharacterService _service;

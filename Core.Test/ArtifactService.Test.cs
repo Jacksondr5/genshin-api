@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Force.DeepCloner;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Core.Test
 {
@@ -32,11 +32,26 @@ namespace Core.Test
             _repoMock
                 .Setup(x => x.GetAllArtifacts())
                 .ReturnsAsync(new List<Artifact> { _testArtifact });
+            _repoMock.Setup(x => x.GetMaxId()).ReturnsAsync(_testArtifact.Id);
             _service = new(_repoMock.Object);
         }
 
         [TestMethod]
-        public async Task CreateArtifact_InputIsGood_ShouldAssignId()
+        public async Task CreateArtifact_MaxIdIsNull_ShouldAssignId()
+        {
+            //Assemble
+            var expectedId = 1;
+            _repoMock.Setup(x => x.GetMaxId()).ReturnsAsync((int?)null);
+
+            //Act
+            var actual = await _service.CreateArtifact(_testArtifact);
+
+            //Assert
+            actual.Id.Should().Be(expectedId);
+        }
+
+        [TestMethod]
+        public async Task CreateArtifact_MaxIdIsNotNull_ShouldAssignId()
         {
             //Assemble
             var expectedId = _testArtifact.Id + 1;

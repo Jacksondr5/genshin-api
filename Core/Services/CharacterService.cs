@@ -27,8 +27,7 @@ namespace Core
 
         public async Task<Character> CreateCharacter(Character newCharacter)
         {
-            var characters = await _repo.GetAllCharacters();
-            newCharacter.Id = characters.Max(x => x.Id) + 1;
+            newCharacter.Id = (await _repo.GetMaxId() ?? 0) + 1;
             await _repo.CreateCharacter(newCharacter);
             return newCharacter;
         }

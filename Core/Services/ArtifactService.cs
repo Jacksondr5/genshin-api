@@ -12,8 +12,7 @@ namespace Core
 
         public async Task<Artifact> CreateArtifact(Artifact newArtifact)
         {
-            var artifacts = await GetAllArtifacts();
-            newArtifact.Id = artifacts.Max(x => x.Id) + 1;
+            newArtifact.Id = (await _repo.GetMaxId() ?? 0) + 1;
             await _repo.CreateArtifact(newArtifact);
             return newArtifact;
         }

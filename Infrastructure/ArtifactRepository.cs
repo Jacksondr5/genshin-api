@@ -1,43 +1,34 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core;
+using MongoDB.Driver;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Infrastructure
 {
     public class ArtifactRepository : IArtifactRepository
     {
-        private readonly StorageModelRepository _storageModelRepo;
-        public ArtifactRepository(StorageModelRepository storageModelRepo) =>
-            (_storageModelRepo) = (storageModelRepo);
-
-        public async Task CreateArtifact(Artifact newArtifact)
+        private readonly IMongoCollection<Artifact> _collection;
+        public ArtifactRepository(IMongoDatabase database)
         {
-            var model = await _storageModelRepo.GetStorageModel();
-            model.Artifacts.Add(newArtifact);
-            await _storageModelRepo.UpdateStorageModel(model);
+            _collection = database.GetCollection<Artifact>("artifacts");
         }
 
-        public async Task DeleteArtifact(int artifactId)
-        {
-            var model = await _storageModelRepo.GetStorageModel();
-            model.Artifacts.RemoveAll(x => x.Id == artifactId);
-            await _storageModelRepo.UpdateStorageModel(model);
-        }
+        public Task CreateArtifact(Artifact newArtifact) =>
+            _collection.InsertOneAsync(newArtifact);
 
-        public async Task<List<Artifact>> GetAllArtifacts()
-        {
-            var model = await _storageModelRepo.GetStorageModel();
-            return model.Artifacts;
-        }
+        public Task DeleteArtifact(int artifactId) =>
+            _collection.DeleteOneAsync(x => x.Id == artifactId);
 
-        public async Task UpdateArtifact(Artifact updatedArtifact)
-        {
-            var model = await _storageModelRepo.GetStorageModel();
-            var artifact =
-                model.Artifacts.First(x => x.Id == updatedArtifact.Id);
-            artifact = updatedArtifact;
-            await _storageModelRepo.UpdateStorageModel(model);
-        }
+        public Task<List<Artifact>> GetAllArtifacts() =>
+            _collection.Find(_ => true).ToListAsync();
+
+        public Task<int?> GetMaxId() =>
+            InfrastructureUtils.GetMaxId<Artifact>(_collection);
+
+        public Task UpdateArtifact(Artifact updatedArtifact) =>
+            _collection.ReplaceOneAsync(
+                x => x.Id == updatedArtifact.Id,
+                updatedArtifact
+            );
     }
 }

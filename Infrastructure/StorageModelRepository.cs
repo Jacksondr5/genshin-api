@@ -1,8 +1,8 @@
-using System.Net.Http;
-using System.Threading.Tasks;
 using Core;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Infrastructure
 {

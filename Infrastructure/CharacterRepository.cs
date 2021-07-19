@@ -1,36 +1,31 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core;
+using MongoDB.Driver;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Infrastructure
 {
     public class CharacterRepository : ICharacterRepository
     {
-        private readonly StorageModelRepository _storageModelRepo;
-        public CharacterRepository(StorageModelRepository storageModelRepo) =>
-            (_storageModelRepo) = (storageModelRepo);
-
-        public async Task CreateCharacter(Character newCharacter)
+        private readonly IMongoCollection<Character> _collection;
+        public CharacterRepository(IMongoDatabase database)
         {
-            var model = await _storageModelRepo.GetStorageModel();
-            model.Characters.Add(newCharacter);
-            await _storageModelRepo.UpdateStorageModel(model);
+            _collection = database.GetCollection<Character>("characters");
         }
 
-        public async Task<List<Character>> GetAllCharacters()
-        {
-            var model = await _storageModelRepo.GetStorageModel();
-            return model.Characters;
-        }
+        public Task CreateCharacter(Character newCharacter) =>
+            _collection.InsertOneAsync(newCharacter);
 
-        public async Task UpdateCharacter(Character updatedCharacter)
-        {
-            var model = await _storageModelRepo.GetStorageModel();
-            var character =
-                model.Characters.First(x => x.Id == updatedCharacter.Id);
-            character = updatedCharacter;
-            await _storageModelRepo.UpdateStorageModel(model);
-        }
+        public Task<List<Character>> GetAllCharacters() =>
+            _collection.Find(_ => true).ToListAsync();
+
+        public Task<int?> GetMaxId() =>
+            InfrastructureUtils.GetMaxId<Character>(_collection);
+
+        public Task UpdateCharacter(Character updatedCharacter) =>
+            _collection.ReplaceOneAsync(
+                x => x.Id == updatedCharacter.Id,
+                updatedCharacter
+            );
     }
 }

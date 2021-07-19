@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Force.DeepCloner;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Core.Test
 {
@@ -41,6 +40,7 @@ namespace Core.Test
             _repoMock
                 .Setup(x => x.GetAllCharacters())
                 .ReturnsAsync(new List<Character> { _testCharacter });
+            _repoMock.Setup(x => x.GetMaxId()).ReturnsAsync(_testCharacter.Id);
             _service = new(_repoMock.Object);
         }
 
@@ -98,7 +98,21 @@ namespace Core.Test
         }
 
         [TestMethod]
-        public async Task CreateCharacter_InputIsGood_ShouldAssignId()
+        public async Task CreateCharacter_MaxIdIsNull_ShouldAssignId()
+        {
+            //Assemble
+            var expectedId = 1;
+            _repoMock.Setup(x => x.GetMaxId()).ReturnsAsync((int?)null);
+
+            //Act
+            var actual = await _service.CreateCharacter(_testCharacter);
+
+            //Assert
+            actual.Id.Should().Be(expectedId);
+        }
+
+        [TestMethod]
+        public async Task CreateCharacter_MaxIdIsNotNull_ShouldAssignId()
         {
             //Assemble
             var expectedId = _testCharacter.Id + 1;

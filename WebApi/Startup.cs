@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core;
 using Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace WebApi
@@ -38,7 +31,10 @@ namespace WebApi
                         //builder
                         //    .WithOrigins("http://*.j5")
                         //    .SetIsOriginAllowedToAllowWildcardSubdomains();
-                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
                     }
                 )
             );
@@ -46,11 +42,15 @@ namespace WebApi
             services.AddScoped<IArtifactRepository, ArtifactRepository>();
             services.AddScoped<ICharacterService, CharacterService>();
             services.AddScoped<ICharacterRepository, CharacterRepository>();
+            services.AddMongoDb(Configuration);
             services.AddScoped(typeof(StorageModelRepository));
             services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
+                c.SwaggerDoc(
+                    "v1",
+                    new OpenApiInfo { Title = "WebApi", Version = "v1" }
+                );
             });
         }
 
@@ -61,7 +61,10 @@ namespace WebApi
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint(
+                    "/swagger/v1/swagger.json",
+                    "WebApi v1"
+                ));
             }
 
             app.UseHttpsRedirection();

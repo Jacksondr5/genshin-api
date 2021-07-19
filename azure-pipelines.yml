@@ -20,6 +20,23 @@ steps:
     inputs:
       packageType: "sdk"
       version: "5.0.x"
+  # Needed for SonarQube
+  - task: UseDotNet@2
+    displayName: Install .NET Core 2.2.x for SonarCloud
+    inputs:
+      packageType: "sdk"
+      version: "2.2.x"
+  - task: SonarCloudPrepare@1
+    displayName: Prepare SonarCloud Analysis
+    inputs:
+      SonarCloud: "SonarCloud"
+      organization: "jacksondr5"
+      scannerMode: "MSBuild"
+      projectKey: "4f6fdf9a4f4b3536e30a2c1aec565cfc4a92dd1d"
+      projectName: "genshin-api"
+      projectVersion: $(Build.BuildNumber)
+      extraProperties: |
+        sonar.coverage.exclusions=**/WebApi/**,**/Infrastructure/**
   - task: DotNetCoreCLI@2
     displayName: Restore Packages
     inputs:
@@ -39,6 +56,12 @@ steps:
       command: test
       projects: $(solution)
       arguments: "-c $(buildconfiguration) --no-build"
+  - task: SonarCloudAnalyze@1
+    displayName: Run SonarCloud Analysis
+  - task: SonarCloudPublish@1
+    displayName: Publish SonarCloud Analysis
+    inputs:
+      pollingTimeoutSec: "300"
   - task: DotNetCoreCLI@2
     displayName: Publish Solution
     inputs:

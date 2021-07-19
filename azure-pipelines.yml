@@ -55,7 +55,7 @@ steps:
     inputs:
       command: test
       projects: $(solution)
-      arguments: "-c $(buildconfiguration) --no-build"
+      arguments: "-c $(buildconfiguration) --no-build --nologo -s ./UnitTest.runsettings"
   - task: SonarCloudAnalyze@1
     displayName: Run SonarCloud Analysis
   - task: SonarCloudPublish@1

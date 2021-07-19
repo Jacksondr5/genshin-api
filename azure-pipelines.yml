@@ -21,18 +21,18 @@ steps:
       packageType: "sdk"
       version: "5.0.x"
   # Needed for SonarQube
-  - task: UseDotNet@2
-    displayName: Install .NET Core 2.2.x for SonarCloud
-    inputs:
-      packageType: "sdk"
-      version: "2.2.x"
+  # - task: UseDotNet@2
+  #   displayName: Install .NET Core 2.2.x for SonarCloud
+  #   inputs:
+  #     packageType: "sdk"
+  #     version: "2.2.x"
   - task: SonarCloudPrepare@1
     displayName: Prepare SonarCloud Analysis
     inputs:
       SonarCloud: "SonarCloud"
       organization: "jacksondr5"
       scannerMode: "MSBuild"
-      projectKey: "4f6fdf9a4f4b3536e30a2c1aec565cfc4a92dd1d"
+      projectKey: "Jacksondr5_genshin-api"
       projectName: "genshin-api"
       projectVersion: $(Build.BuildNumber)
       extraProperties: |

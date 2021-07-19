@@ -9,12 +9,14 @@ namespace WebApi
     {
         private const string _serverConfigLocation =
             "J5:MongoConnections:Genshin:Server";
+        private const string _databaseConfigLocation =
+            "J5:MongoConnections:Genshin:Database";
         public static IServiceCollection AddMongoDb(
             this IServiceCollection services,
             IConfiguration configuration
         )
         {
-            var server = configuration["J5:MongoConnections:Genshin:Server"];
+            var server = configuration[_serverConfigLocation];
             if (string.IsNullOrWhiteSpace(server))
                 throw new GenshinException(
                     ConfiguraionEmpty(_serverConfigLocation)
@@ -22,9 +24,10 @@ namespace WebApi
             var client = new MongoClient(server);
             if (client is null)
                 throw new GenshinException("mongo client is null");
-            var database = client.GetDatabase(
-                configuration["J5:MongoConnections:Genshin:Database"]
-            );
+            var dbName = configuration[_databaseConfigLocation];
+            if (string.IsNullOrWhiteSpace(dbName))
+                throw new GenshinException("mongo database is null");
+            var database = client.GetDatabase(dbName);
             services.AddScoped<IMongoDatabase>(x => database);
             return services;
         }

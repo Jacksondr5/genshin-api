@@ -19,8 +19,6 @@ namespace WebApi
         {
             var server = GetConnectionString(configuration);
             var client = new MongoClient(server);
-            if (client is null)
-                throw new GenshinException("mongo client is null");
             var dbName = configuration[_databaseConfigLocation];
             if (string.IsNullOrWhiteSpace(dbName))
                 throw new GenshinException("mongo database is null");

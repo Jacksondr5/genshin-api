@@ -20,12 +20,22 @@ steps:
     inputs:
       packageType: "sdk"
       version: "5.0.x"
+
   # Needed for SonarQube
   # - task: UseDotNet@2
   #   displayName: Install .NET Core 2.2.x for SonarCloud
   #   inputs:
   #     packageType: "sdk"
   #     version: "2.2.x"
+
+  - task: PowerShell@2
+    displayName: "Use JDK11 by default"
+    inputs:
+      targetType: "inline"
+      script: |
+        $jdkPath = $env:JAVA_HOME_11_X64
+        Write-Host "##vso[task.setvariable variable=JAVA_HOME]$jdkPath"
+
   - task: SonarCloudPrepare@1
     displayName: Prepare SonarCloud Analysis
     inputs:
@@ -37,6 +47,7 @@ steps:
       projectVersion: $(Build.BuildNumber)
       extraProperties: |
         sonar.coverage.exclusions=**/WebApi/**,**/Infrastructure/**
+
   - task: DotNetCoreCLI@2
     displayName: Restore Packages
     inputs:
@@ -44,24 +55,29 @@ steps:
       projects: $(solution)
       feedsToUse: "select"
       verbosityRestore: "Minimal"
+
   - task: DotNetCoreCLI@2
     displayName: Build Solution
     inputs:
       command: "build"
       projects: $(solution)
       arguments: "-c $(buildConfiguration) --no-restore --nologo"
+
   - task: DotNetCoreCLI@2
     displayName: Run Tests
     inputs:
       command: test
       projects: $(solution)
-      arguments: "-c $(buildconfiguration) --no-build --nologo -s ./UnitTest.runsettings"
+      arguments: '-c $(buildconfiguration) --no-build --nologo --collect "Code Coverage"'
+
   - task: SonarCloudAnalyze@1
     displayName: Run SonarCloud Analysis
+
   - task: SonarCloudPublish@1
     displayName: Publish SonarCloud Analysis
     inputs:
       pollingTimeoutSec: "300"
+
   - task: DotNetCoreCLI@2
     displayName: Publish Solution
     inputs:
@@ -69,11 +85,13 @@ steps:
       projects: $(solution)
       arguments: "-c $(buildConfiguration) --no-build --nologo"
       zipAfterPublish: false
+
   - task: Docker@2
     displayName: Login to Docker
     inputs:
       command: login
       containerRegistry: "Docker Hub"
+
   - task: Docker@2
     displayName: Build and Push Docker Image
     inputs:

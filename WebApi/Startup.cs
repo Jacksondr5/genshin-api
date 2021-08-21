@@ -68,7 +68,9 @@ namespace WebApi
                 ));
             }
 
-            app.UseHttpsRedirection();
+            //For when you want to do HTTPS
+            //https://github.com/dotnet/dotnet-docker/blob/main/samples/host-aspnetcore-https.md
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 

@@ -1,8 +1,5 @@
 name: "1.0$(Rev:.r)"
 
-pool:
-  vmImage: "ubuntu-latest"
-
 trigger:
   - main
 
@@ -13,92 +10,119 @@ variables:
   buildPlatform: "Any CPU"
   buildConfiguration: "Release"
   appName: "genshin-api"
+jobs:
+  - job: build
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+      - task: UseDotNet@2
+        displayName: Install .NET 5.0.x
+        inputs:
+          packageType: "sdk"
+          version: "5.0.x"
 
-steps:
-  - task: UseDotNet@2
-    displayName: Install .NET 5.0.x
-    inputs:
-      packageType: "sdk"
-      version: "5.0.x"
+      - task: DotNetCoreCLI@2
+        displayName: Restore Packages
+        inputs:
+          command: "restore"
+          projects: $(solution)
+          feedsToUse: "select"
+          verbosityRestore: "Minimal"
 
-  # Needed for SonarQube
-  - task: UseDotNet@2
-    displayName: Install .NET Core 2.2.x for SonarCloud
-    inputs:
-      packageType: "sdk"
-      version: "2.2.x"
+      - task: DotNetCoreCLI@2
+        displayName: Build Solution
+        inputs:
+          command: "build"
+          projects: $(solution)
+          arguments: "-c $(buildConfiguration) --no-restore --nologo"
 
-  - task: PowerShell@2
-    displayName: "Use JDK11 by default"
-    inputs:
-      targetType: "inline"
-      script: |
-        $jdkPath = $env:JAVA_HOME_11_X64
-        Write-Host "##vso[task.setvariable variable=JAVA_HOME]$jdkPath"
+      - task: DotNetCoreCLI@2
+        displayName: Run Tests
+        inputs:
+          command: test
+          projects: $(solution)
+          arguments: '-c $(buildconfiguration) --no-build --nologo --collect "Code Coverage"'
 
-  - task: SonarCloudPrepare@1
-    displayName: Prepare SonarCloud Analysis
-    inputs:
-      SonarCloud: "SonarCloud"
-      organization: "jacksondr5"
-      scannerMode: "MSBuild"
-      projectKey: "Jacksondr5_genshin-api"
-      projectName: "genshin-api"
-      projectVersion: $(Build.BuildNumber)
-      extraProperties: |
-        sonar.coverage.exclusions=**/WebApi/**,**/Infrastructure/**
+      - task: DotNetCoreCLI@2
+        displayName: Publish Solution
+        inputs:
+          command: "publish"
+          projects: $(solution)
+          arguments: "-c $(buildConfiguration) --no-build --nologo"
+          zipAfterPublish: false
 
-  - task: DotNetCoreCLI@2
-    displayName: Restore Packages
-    inputs:
-      command: "restore"
-      projects: $(solution)
-      feedsToUse: "select"
-      verbosityRestore: "Minimal"
+      - task: Docker@2
+        displayName: Login to Docker
+        inputs:
+          command: login
+          containerRegistry: "Docker Hub"
 
-  - task: DotNetCoreCLI@2
-    displayName: Build Solution
-    inputs:
-      command: "build"
-      projects: $(solution)
-      arguments: "-c $(buildConfiguration) --no-restore --nologo"
+      - task: Docker@2
+        displayName: Build and Push Docker Image
+        inputs:
+          containerRegistry: "Docker Hub"
+          repository: jacksondr5/genshin-api
+          command: buildAndPush
+          Dockerfile: Dockerfile
+          tags: |
+            $(Build.BuildNumber)
+            latest
 
-  - task: DotNetCoreCLI@2
-    displayName: Run Tests
-    inputs:
-      command: test
-      projects: $(solution)
-      arguments: '-c $(buildconfiguration) --no-build --nologo --collect "Code Coverage"'
+  - job: analyze
+    pool:
+      vmImage: "windows-latest"
+    steps:
+      - task: UseDotNet@2
+        displayName: Install .NET 5.0.x
+        inputs:
+          packageType: "sdk"
+          version: "5.0.x"
 
-  - task: SonarCloudAnalyze@1
-    displayName: Run SonarCloud Analysis
+      # Needed for SonarQube
+      - task: UseDotNet@2
+        displayName: Install .NET Core 2.2.x for SonarCloud
+        inputs:
+          packageType: "sdk"
+          version: "2.2.x"
 
-  - task: SonarCloudPublish@1
-    displayName: Publish SonarCloud Analysis
-    inputs:
-      pollingTimeoutSec: "300"
+      - task: SonarCloudPrepare@1
+        displayName: Prepare SonarCloud Analysis
+        inputs:
+          SonarCloud: "SonarCloud"
+          organization: "jacksondr5"
+          scannerMode: "MSBuild"
+          projectKey: "Jacksondr5_genshin-api"
+          projectName: "genshin-api"
+          projectVersion: $(Build.BuildNumber)
+          extraProperties: |
+            sonar.coverage.exclusions=**/WebApi/**,**/Infrastructure/**
 
-  - task: DotNetCoreCLI@2
-    displayName: Publish Solution
-    inputs:
-      command: "publish"
-      projects: $(solution)
-      arguments: "-c $(buildConfiguration) --no-build --nologo"
-      zipAfterPublish: false
+      - task: DotNetCoreCLI@2
+        displayName: Restore Packages
+        inputs:
+          command: "restore"
+          projects: $(solution)
+          feedsToUse: "select"
+          verbosityRestore: "Minimal"
 
-  - task: Docker@2
-    displayName: Login to Docker
-    inputs:
-      command: login
-      containerRegistry: "Docker Hub"
+      - task: DotNetCoreCLI@2
+        displayName: Build Solution
+        inputs:
+          command: "build"
+          projects: $(solution)
+          arguments: "-c $(buildConfiguration) --no-restore --nologo"
 
-  - task: Docker@2
-    displayName: Build and Push Docker Image
-    inputs:
-      containerRegistry: "Docker Hub"
-      repository: jacksondr5/genshin-api
-      command: buildAndPush
-      Dockerfile: Dockerfile
-      tags: |
-        $(Build.BuildNumber)
-        latest
+      - task: DotNetCoreCLI@2
+        displayName: Run Tests
+        inputs:
+          command: test
+          projects: $(solution)
+          arguments: '-c $(buildconfiguration) --no-build --nologo --collect "Code Coverage"'
+
+      - task: SonarCloudAnalyze@1
+        displayName: Run SonarCloud Analysis
+
+      - task: SonarCloudPublish@1
+        displayName: Publish SonarCloud Analysis
+        inputs:
+          pollingTimeoutSec: "300"

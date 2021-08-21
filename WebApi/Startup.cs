@@ -43,7 +43,6 @@ namespace WebApi
             services.AddScoped<ICharacterService, CharacterService>();
             services.AddScoped<ICharacterRepository, CharacterRepository>();
             services.AddMongoDb(Configuration);
-            services.AddScoped(typeof(StorageModelRepository));
             services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(c =>
             {
@@ -52,7 +51,7 @@ namespace WebApi
                     new OpenApiInfo { Title = "WebApi", Version = "v1" }
                 );
             });
-            services.AddHealthChecks();
+            services.AddHealthChecks().AddMongoDbHealthCheck(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,3 +1,4 @@
+using System;
 using Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +17,7 @@ namespace WebApi
             IConfiguration configuration
         )
         {
-            var server = configuration[_serverConfigLocation];
-            if (string.IsNullOrWhiteSpace(server))
-                throw new GenshinException(
-                    ConfiguraionEmpty(_serverConfigLocation)
-                );
+            var server = GetConnectionString(configuration);
             var client = new MongoClient(server);
             if (client is null)
                 throw new GenshinException("mongo client is null");
@@ -30,6 +27,29 @@ namespace WebApi
             var database = client.GetDatabase(dbName);
             services.AddScoped<IMongoDatabase>(x => database);
             return services;
+        }
+
+        public static IHealthChecksBuilder AddMongoDbHealthCheck(
+            this IHealthChecksBuilder builder,
+            IConfiguration configuration
+        )
+        {
+            var connectionString = GetConnectionString(configuration);
+            builder.AddMongoDb(
+                connectionString,
+                timeout: TimeSpan.FromSeconds(5)
+            );
+            return builder;
+        }
+
+        private static string GetConnectionString(IConfiguration configuration)
+        {
+            var connectionString = configuration[_serverConfigLocation];
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new GenshinException(
+                    ConfiguraionEmpty(_serverConfigLocation)
+                );
+            return connectionString;
         }
 
         private static string ConfiguraionEmpty(string configLocation) =>

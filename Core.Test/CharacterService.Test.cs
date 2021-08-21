@@ -186,5 +186,22 @@ namespace Core.Test
                 .ThrowExactly<GenshinException>()
                 .WithMessage(GenshinMessages.LoadoutNotFound);
         }
+
+        [TestMethod]
+        public async Task UpdateLoadout_InputIsGood_ShouldReturnLoadout()
+        {
+            //Assemble
+            var expected = _testCharacter.Loadouts[0].DeepClone();
+            expected.Name = "asdfasdfas";
+
+            //Act
+            var actual = await _service.UpdateLoadout(
+                _testCharacter.Id,
+                expected
+            );
+
+            //Assert
+            actual.Should().BeEquivalentTo(expected);
+        }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Core.Test
@@ -125,7 +126,7 @@ namespace Core.Test
         }
 
         [TestMethod]
-        public async Task CreateCharater_InputIsGood_ShouldStoreCharacter()
+        public async Task CreateCharater_InputIsGood_ShouldCreateCharacter()
         {
             //Act
             await _service.CreateCharacter(_testCharacter);
@@ -202,6 +203,28 @@ namespace Core.Test
 
             //Assert
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public async Task UpdateLoadout_InputIsGood_ShouldUpdateCharacter()
+        {
+            //Assemble
+            var expected = _testCharacter.Loadouts[0].DeepClone();
+            expected.Name = "asdfasdfas";
+
+            //Act
+            await _service.UpdateLoadout(
+                _testCharacter.Id,
+                expected
+            );
+
+            //Assert
+            _repoMock.Verify(
+                x => x.UpdateCharacter(It.Is<Character>(
+                    y => y.Loadouts.Any(z => z.Name == expected.Name)
+                )),
+                Times.Once
+            );
         }
     }
 }

@@ -44,14 +44,14 @@ namespace Core
             var character = characters.FirstOrDefault(x => x.Id == characterId);
             if (character == null)
                 throw new GenshinException(GenshinMessages.CharacterNotFound);
-            var loadout = character.Loadouts.FirstOrDefault(
+            var index = character.Loadouts.FindIndex(
                 x => x.Id == updatedLoadout.Id
             );
-            if (loadout == null)
+            if (index == -1)
                 throw new GenshinException(GenshinMessages.LoadoutNotFound);
-            loadout = updatedLoadout;
+            character.Loadouts[index] = updatedLoadout;
             await _repo.UpdateCharacter(character);
-            return loadout;
+            return updatedLoadout;
         }
     }
 }

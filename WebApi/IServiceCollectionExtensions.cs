@@ -1,8 +1,8 @@
-using System;
-using Core;
+using Core.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using System;
 
 namespace WebApi
 {
@@ -21,7 +21,7 @@ namespace WebApi
             var client = new MongoClient(server);
             var dbName = configuration[_databaseConfigLocation];
             if (string.IsNullOrWhiteSpace(dbName))
-                throw new GenshinException("mongo database is null");
+                throw new GenshinApplicationException("mongo database is null");
             var database = client.GetDatabase(dbName);
             services.AddScoped<IMongoDatabase>(x => database);
             return services;
@@ -44,7 +44,7 @@ namespace WebApi
         {
             var connectionString = configuration[_serverConfigLocation];
             if (string.IsNullOrWhiteSpace(connectionString))
-                throw new GenshinException(
+                throw new GenshinApplicationException(
                     ConfiguraionEmpty(_serverConfigLocation)
                 );
             return connectionString;

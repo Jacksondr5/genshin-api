@@ -2,9 +2,8 @@ using System.Collections.Generic;
 
 namespace Core
 {
-    public class Artifact
+    public class Artifact : StorableData
     {
-        public int Id { get; set; }
         public int Level { get; set; }
         public ArtifactStat MainStat { get; set; } = new ArtifactStat();
         public int Quality { get; set; }

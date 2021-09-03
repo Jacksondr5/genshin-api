@@ -1,4 +1,6 @@
 using Core;
+using Core.Interfaces;
+using Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,24 +11,25 @@ namespace WebApi.Controllers
     [Route("artifact")]
     public class ArtifactController : ControllerBase
     {
-        private readonly IArtifactService _service;
-        public ArtifactController(IArtifactService service) =>
-            (_service) = (service);
+        private readonly GenericCrudService<Artifact> _service;
+        public ArtifactController(IGenericCrudRepository<Artifact> repo)
+        {
+            _service = new GenericCrudService<Artifact>(repo);
+        }
 
         [HttpDelete("{artifactId}")]
         public Task<Artifact> Delete([FromRoute] int artifactId) =>
-            _service.DeleteArtifact(artifactId);
+            _service.Delete(artifactId);
 
         [HttpGet]
-        public Task<List<Artifact>> GetAll() =>
-            _service.GetAllArtifacts();
+        public Task<List<Artifact>> GetAll() => _service.GetAll();
 
         [HttpPost]
         public Task<Artifact> Post([FromBody] Artifact newArtifact) =>
-            _service.CreateArtifact(newArtifact);
+            _service.Create(newArtifact);
 
-        [HttpPut("{artifactId}")]
+        [HttpPut]
         public Task<Artifact> Put([FromBody] Artifact artifact) =>
-            _service.UpdateArtifact(artifact);
+            _service.Update(artifact);
     }
 }

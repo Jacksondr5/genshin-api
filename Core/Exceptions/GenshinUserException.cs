@@ -1,14 +1,17 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Core
+namespace Core.Exceptions
 {
+    /// <summary>
+    /// Represents a 400-level exception.
+    /// </summary>
     [Serializable]
-    public class GenshinException : Exception
+    public class GenshinUserException : Exception
     {
-        public GenshinException(string? message) : base(message) { }
+        public GenshinUserException(string message) : base(message) { }
 
-        protected GenshinException(
+        protected GenshinUserException(
             SerializationInfo info,
             StreamingContext context
         ) : base(info, context) { }

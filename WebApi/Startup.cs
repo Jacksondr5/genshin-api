@@ -1,5 +1,5 @@
-using Core;
-using Infrastructure;
+using Core.Interfaces;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -38,10 +38,10 @@ namespace WebApi
                     }
                 )
             );
-            services.AddScoped<IArtifactService, ArtifactService>();
-            services.AddScoped<IArtifactRepository, ArtifactRepository>();
-            services.AddScoped<ICharacterService, CharacterService>();
-            services.AddScoped<ICharacterRepository, CharacterRepository>();
+            services.AddScoped(
+                typeof(IGenericCrudRepository<>),
+                typeof(GenericCrudRepository<>)
+            );
             services.AddMongoDb(Configuration);
             services.AddControllers().AddNewtonsoftJson();
             services.AddSwaggerGen(c =>

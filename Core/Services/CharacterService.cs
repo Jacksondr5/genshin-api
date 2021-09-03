@@ -1,56 +1,47 @@
-using System.Collections.Generic;
+using Core.Exceptions;
+using Core.Interfaces;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core
+namespace Core.Services
 {
-    public class CharacterService : ICharacterService
+    public class CharacterService : GenericCrudService<Character>
     {
-        private readonly ICharacterRepository _repo;
-        public CharacterService(ICharacterRepository repo) =>
-            (_repo) = (repo);
+        public CharacterService(IGenericCrudRepository<Character> repo)
+            : base(repo) { }
 
         public async Task<Loadout> AddLoadoutToCharacter(
             int characterId,
             Loadout newLoadout
         )
         {
-            var characters = await _repo.GetAllCharacters();
-            var character = characters.FirstOrDefault(x => x.Id == characterId);
-            if (character == null)
-                throw new GenshinException(GenshinMessages.CharacterNotFound);
+            var character = await Get(characterId);
             newLoadout.Id = character.Loadouts.Max(x => x.Id) + 1;
             character.Loadouts.Add(newLoadout);
-            await _repo.UpdateCharacter(character);
+            await _repo.Update(character);
             return newLoadout;
         }
 
-        public async Task<Character> CreateCharacter(Character newCharacter)
+        public override Task<Character> Update(Character updatedEntity)
         {
-            newCharacter.Id = (await _repo.GetMaxId() ?? 0) + 1;
-            await _repo.CreateCharacter(newCharacter);
-            return newCharacter;
+            //TODO: figure out how to do this
+            throw new InvalidOperationException("Cannot update a character");
         }
-
-        public Task<List<Character>> GetAllCharacters() =>
-            _repo.GetAllCharacters();
 
         public async Task<Loadout> UpdateLoadout(
             int characterId,
             Loadout updatedLoadout
         )
         {
-            var characters = await _repo.GetAllCharacters();
-            var character = characters.FirstOrDefault(x => x.Id == characterId);
-            if (character == null)
-                throw new GenshinException(GenshinMessages.CharacterNotFound);
+            var character = await Get(characterId);
             var index = character.Loadouts.FindIndex(
                 x => x.Id == updatedLoadout.Id
             );
             if (index == -1)
-                throw new GenshinException(GenshinMessages.LoadoutNotFound);
+                throw new DataNotfoundException<Loadout>(updatedLoadout.Id);
             character.Loadouts[index] = updatedLoadout;
-            await _repo.UpdateCharacter(character);
+            await _repo.Update(character);
             return updatedLoadout;
         }
     }

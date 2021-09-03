@@ -1,3 +1,5 @@
+using Core.Exceptions;
+using Core.Interfaces;
 using FluentAssertions;
 using Force.DeepCloner;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,13 +9,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core.Test
+namespace Core.Services.Test
 {
     [TestClass]
     public class CharacterServiceTest
     {
         private Character _testCharacter = new();
-        private static Mock<ICharacterRepository> _repoMock = new();
+        private static Mock<IGenericCrudRepository<Character>> _repoMock = new();
         private CharacterService _service = new(_repoMock.Object);
 
         [TestInitialize()]
@@ -39,8 +41,11 @@ namespace Core.Test
             };
             _repoMock = new();
             _repoMock
-                .Setup(x => x.GetAllCharacters())
+                .Setup(x => x.GetAll())
                 .ReturnsAsync(new List<Character> { _testCharacter });
+            _repoMock
+                .Setup(x => x.Get(It.IsAny<int>()))
+                .ReturnsAsync(_testCharacter);
             _repoMock.Setup(x => x.GetMaxId()).ReturnsAsync(_testCharacter.Id);
             _service = new(_repoMock.Object);
         }
@@ -50,18 +55,23 @@ namespace Core.Test
         {
             //Assemble
             _repoMock
-                .Setup(x => x.GetAllCharacters())
-                .ReturnsAsync(new List<Character>());
+                .Setup(x => x.Get(It.IsAny<int>()))
+                .ReturnsAsync((Character?)null);
+            var expected =
+                new DataNotfoundException<Character>(_testCharacter.Id)
+                .Message;
 
             //Act
-            Func<Task<Loadout>> act = () =>
-                _service.AddLoadoutToCharacter(5, _testCharacter.Loadouts[0]);
+            Func<Task<Loadout>> act = () => _service.AddLoadoutToCharacter(
+                _testCharacter.Id,
+                _testCharacter.Loadouts[0]
+            );
 
             //Assert
             act
                 .Should()
-                .ThrowExactly<GenshinException>()
-                .WithMessage(GenshinMessages.CharacterNotFound);
+                .ThrowExactly<DataNotfoundException<Character>>()
+                .WithMessage(expected);
         }
 
         [TestMethod]
@@ -91,62 +101,21 @@ namespace Core.Test
 
             //Assert
             _repoMock.Verify(
-                x => x.UpdateCharacter(
-                    It.Is<Character>(y => y.Loadouts.Count == 2)
-                ),
+                x => x.Update(It.Is<Character>(y => y.Loadouts.Count == 2)),
                 Times.Once
             );
         }
 
         [TestMethod]
-        public async Task CreateCharacter_MaxIdIsNull_ShouldAssignId()
-        {
-            //Assemble
-            var expectedId = 1;
-            _repoMock.Setup(x => x.GetMaxId()).ReturnsAsync((int?)null);
-
-            //Act
-            var actual = await _service.CreateCharacter(_testCharacter);
-
-            //Assert
-            actual.Id.Should().Be(expectedId);
-        }
-
-        [TestMethod]
-        public async Task CreateCharacter_MaxIdIsNotNull_ShouldAssignId()
-        {
-            //Assemble
-            var expectedId = _testCharacter.Id + 1;
-
-            //Act
-            var actual = await _service.CreateCharacter(_testCharacter);
-
-            //Assert
-            actual.Id.Should().Be(expectedId);
-        }
-
-        [TestMethod]
-        public async Task CreateCharater_InputIsGood_ShouldCreateCharacter()
+        public void Update_ShouldThrowException()
         {
             //Act
-            await _service.CreateCharacter(_testCharacter);
+            Func<Task> act = () => _service.Update(_testCharacter);
 
             //Assert
-            _repoMock.Verify(
-                x => x.CreateCharacter(It.IsAny<Character>()),
-                Times.Once
-            );
-        }
-
-        [TestMethod]
-        public async Task GetAllCharacters_ShouldReturnAllCharacters()
-        {
-            //Act
-            var actual = await _service.GetAllCharacters();
-
-
-            //Assert
-            actual.Should().ContainEquivalentOf(_testCharacter);
+            act
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [TestMethod]
@@ -154,18 +123,23 @@ namespace Core.Test
         {
             //Assemble
             _repoMock
-                .Setup(x => x.GetAllCharacters())
-                .ReturnsAsync(new List<Character>());
+                .Setup(x => x.Get(It.IsAny<int>()))
+                .ReturnsAsync((Character?)null);
+            var expected =
+                new DataNotfoundException<Character>(_testCharacter.Id)
+                .Message;
 
             //Act
-            Func<Task<Loadout>> act = () =>
-                _service.UpdateLoadout(5, _testCharacter.Loadouts[0]);
+            Func<Task<Loadout>> act = () => _service.UpdateLoadout(
+                _testCharacter.Id,
+                _testCharacter.Loadouts[0]
+            );
 
             //Assert
             act
                 .Should()
-                .ThrowExactly<GenshinException>()
-                .WithMessage(GenshinMessages.CharacterNotFound);
+                .ThrowExactly<DataNotfoundException<Character>>()
+                .WithMessage(expected);
         }
 
         [TestMethod]
@@ -174,6 +148,9 @@ namespace Core.Test
             //Assemble
             var loadout = _testCharacter.Loadouts[0].DeepClone();
             _testCharacter.Loadouts = new List<Loadout>();
+            var expected =
+                new DataNotfoundException<Loadout>(loadout.Id)
+                .Message;
 
             //Act
             Func<Task<Loadout>> act = () => _service.UpdateLoadout(
@@ -184,8 +161,8 @@ namespace Core.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<GenshinException>()
-                .WithMessage(GenshinMessages.LoadoutNotFound);
+                .ThrowExactly<DataNotfoundException<Loadout>>()
+                .WithMessage(expected);
         }
 
         [TestMethod]
@@ -220,7 +197,7 @@ namespace Core.Test
 
             //Assert
             _repoMock.Verify(
-                x => x.UpdateCharacter(It.Is<Character>(
+                x => x.Update(It.Is<Character>(
                     y => y.Loadouts.Any(z => z.Name == expected.Name)
                 )),
                 Times.Once

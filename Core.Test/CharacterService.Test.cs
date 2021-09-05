@@ -58,7 +58,7 @@ namespace Core.Services.Test
                 .Setup(x => x.Get(It.IsAny<int>()))
                 .ReturnsAsync((Character?)null);
             var expected =
-                new DataNotfoundException<Character>(_testCharacter.Id)
+                new DataNotFoundException<Character>(_testCharacter.Id)
                 .Message;
 
             //Act
@@ -70,7 +70,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotfoundException<Character>>()
+                .ThrowExactly<DataNotFoundException<Character>>()
                 .WithMessage(expected);
         }
 
@@ -126,7 +126,7 @@ namespace Core.Services.Test
                 .Setup(x => x.Get(It.IsAny<int>()))
                 .ReturnsAsync((Character?)null);
             var expected =
-                new DataNotfoundException<Character>(_testCharacter.Id)
+                new DataNotFoundException<Character>(_testCharacter.Id)
                 .Message;
 
             //Act
@@ -138,7 +138,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotfoundException<Character>>()
+                .ThrowExactly<DataNotFoundException<Character>>()
                 .WithMessage(expected);
         }
 
@@ -149,7 +149,7 @@ namespace Core.Services.Test
             var loadout = _testCharacter.Loadouts[0].DeepClone();
             _testCharacter.Loadouts = new List<Loadout>();
             var expected =
-                new DataNotfoundException<Loadout>(loadout.Id)
+                new DataNotFoundException<Loadout>(loadout.Id)
                 .Message;
 
             //Act
@@ -161,7 +161,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotfoundException<Loadout>>()
+                .ThrowExactly<DataNotFoundException<Loadout>>()
                 .WithMessage(expected);
         }
 

@@ -1,4 +1,5 @@
 using Core;
+using Core.Exceptions;
 using Core.Interfaces;
 using MongoDB.Driver;
 using System.Collections.Generic;
@@ -12,8 +13,16 @@ namespace Infrastructure.Repositories
         private readonly IMongoCollection<T> _collection;
         public GenericCrudRepository(IMongoDatabase database)
         {
-            _collection =
-                database.GetCollection<T>(CoreUtils.GetStorableDataName<T>());
+            var collectionName = typeof(T).Name switch
+            {
+                "Artifact" => "artifacts",
+                "Character" => "characters",
+                "Team" => "teams",
+                _ => throw new GenshinApplicationException(
+                    "type used in GetStorableDataName doesn't correspond to a known StorableData (**this shouldn't happen due to generic constraints**)"
+                ),
+            };
+            _collection = database.GetCollection<T>(collectionName);
         }
         public Task Create(T entity) =>
             _collection.InsertOneAsync(entity);

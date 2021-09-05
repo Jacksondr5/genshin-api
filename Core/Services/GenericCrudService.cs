@@ -34,7 +34,7 @@ namespace Core.Services
         {
             var entity = await _repo.Get(id);
             if (entity == null)
-                throw new DataNotfoundException<T>(id);
+                throw new DataNotFoundException<T>(id);
             return entity;
         }
 

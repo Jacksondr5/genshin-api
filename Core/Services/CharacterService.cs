@@ -39,7 +39,7 @@ namespace Core.Services
                 x => x.Id == updatedLoadout.Id
             );
             if (index == -1)
-                throw new DataNotfoundException<Loadout>(updatedLoadout.Id);
+                throw new DataNotFoundException<Loadout>(updatedLoadout.Id);
             character.Loadouts[index] = updatedLoadout;
             await _repo.Update(character);
             return updatedLoadout;

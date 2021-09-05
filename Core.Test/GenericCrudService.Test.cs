@@ -98,7 +98,7 @@ namespace Core.Services.Test
                 .Setup(x => x.Get(It.IsAny<int>()))
                 .ReturnsAsync((TestStorableData?)null);
             var expected =
-                new DataNotfoundException<TestStorableData>(_testData.Id)
+                new DataNotFoundException<TestStorableData>(_testData.Id)
                 .Message;
 
             //Act
@@ -107,7 +107,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotfoundException<TestStorableData>>()
+                .ThrowExactly<DataNotFoundException<TestStorableData>>()
                 .WithMessage(expected);
         }
 
@@ -144,7 +144,7 @@ namespace Core.Services.Test
                 .Setup(x => x.Get(It.IsAny<int>()))
                 .ReturnsAsync((TestStorableData?)null);
             var expected =
-                new DataNotfoundException<TestStorableData>(_testData.Id)
+                new DataNotFoundException<TestStorableData>(_testData.Id)
                 .Message;
 
             //Act
@@ -153,7 +153,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotfoundException<TestStorableData>>()
+                .ThrowExactly<DataNotFoundException<TestStorableData>>()
                 .WithMessage(expected);
         }
 
@@ -184,7 +184,7 @@ namespace Core.Services.Test
                 .Setup(x => x.Get(It.IsAny<int>()))
                 .ReturnsAsync((TestStorableData?)null);
             var expected =
-                new DataNotfoundException<TestStorableData>(_testData.Id)
+                new DataNotFoundException<TestStorableData>(_testData.Id)
                 .Message;
 
             //Act
@@ -193,7 +193,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotfoundException<TestStorableData>>()
+                .ThrowExactly<DataNotFoundException<TestStorableData>>()
                 .WithMessage(expected);
         }
 

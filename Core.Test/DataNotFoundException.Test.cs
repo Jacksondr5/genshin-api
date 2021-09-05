@@ -64,6 +64,7 @@ namespace Core.Exceptions.Test
         }
     }
 
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class StorableDataTypesAttribute : Attribute, ITestDataSource
     {
         public IEnumerable<object[]> GetData(MethodInfo methodInfo) =>

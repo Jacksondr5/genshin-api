@@ -70,7 +70,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotFoundException<Character>>()
+                .ThrowExactlyAsync<DataNotFoundException<Character>>()
                 .WithMessage(expected);
         }
 
@@ -115,7 +115,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactlyAsync<InvalidOperationException>();
         }
 
         [TestMethod]
@@ -138,7 +138,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotFoundException<Character>>()
+                .ThrowExactlyAsync<DataNotFoundException<Character>>()
                 .WithMessage(expected);
         }
 
@@ -161,7 +161,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotFoundException<Loadout>>()
+                .ThrowExactlyAsync<DataNotFoundException<Loadout>>()
                 .WithMessage(expected);
         }
 

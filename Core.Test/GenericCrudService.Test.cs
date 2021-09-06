@@ -107,7 +107,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotFoundException<TestStorableData>>()
+                .ThrowExactlyAsync<DataNotFoundException<TestStorableData>>()
                 .WithMessage(expected);
         }
 
@@ -153,7 +153,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotFoundException<TestStorableData>>()
+                .ThrowExactlyAsync<DataNotFoundException<TestStorableData>>()
                 .WithMessage(expected);
         }
 
@@ -193,7 +193,7 @@ namespace Core.Services.Test
             //Assert
             act
                 .Should()
-                .ThrowExactly<DataNotFoundException<TestStorableData>>()
+                .ThrowExactlyAsync<DataNotFoundException<TestStorableData>>()
                 .WithMessage(expected);
         }
 

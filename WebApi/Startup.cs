@@ -9,7 +9,6 @@ using Microsoft.OpenApi.Models;
 
 namespace WebApi
 {
-
     public class Startup
     {
         private const string CorsPolicyName = "_k8s.j5 policy";
@@ -20,7 +19,6 @@ namespace WebApi
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(o =>
@@ -48,24 +46,25 @@ namespace WebApi
             {
                 c.SwaggerDoc(
                     "v1",
-                    new OpenApiInfo { Title = "WebApi", Version = "v1" }
+                    new OpenApiInfo { Title = "Genshin API", Version = "v1" }
                 );
             });
             services.AddHealthChecks().AddMongoDbHealthCheck(Configuration);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint(
-                    "/swagger/v1/swagger.json",
-                    "WebApi v1"
-                ));
             }
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Genshin API");
+                c.RoutePrefix = "";
+                c.DocumentTitle = "Genshin API";
+            });
 
             //For when you want to do HTTPS
             //https://github.com/dotnet/dotnet-docker/blob/main/samples/host-aspnetcore-https.md

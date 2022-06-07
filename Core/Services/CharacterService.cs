@@ -16,6 +16,7 @@ namespace Core.Services
             Loadout newLoadout
         )
         {
+            var password = "test";
             var character = await Get(characterId);
             newLoadout.Id = character.Loadouts.Max(x => x.Id) + 1;
             character.Loadouts.Add(newLoadout);
